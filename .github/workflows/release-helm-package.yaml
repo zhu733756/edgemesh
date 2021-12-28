@@ -29,3 +29,13 @@ jobs:
       - name: Release helm package
         run: |
           chmod a+x hack/update-helm-package.sh && hack/update-helm-package.sh
+
+      - name: Set environment variable
+        run: |
+          NEED_AUTO_COMMIT=$(git diff --quiet HEAD build/helm)
+          echo "NEED_AUTO_COMMIT=$NEED_AUTO_COMMIT" >> $GITHUB_ENV
+          
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        if: ${{ env.NEED_AUTO_COMMIT != '' }}
+        with:
+          push_options: '--force'
